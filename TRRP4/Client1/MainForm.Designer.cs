@@ -34,8 +34,9 @@ namespace Client
             this.btBrowse = new System.Windows.Forms.Button();
             this.tbFileName = new System.Windows.Forms.TextBox();
             this.gbInput = new System.Windows.Forms.GroupBox();
-            this.output = new System.Windows.Forms.RichTextBox();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.btSend = new System.Windows.Forms.Button();
+            this.output = new System.Windows.Forms.RichTextBox();
             this.gbInput.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -68,6 +69,7 @@ namespace Client
             // 
             // gbInput
             // 
+            this.gbInput.Controls.Add(this.btnCancel);
             this.gbInput.Controls.Add(this.btSend);
             this.gbInput.Controls.Add(this.label1);
             this.gbInput.Controls.Add(this.btBrowse);
@@ -79,15 +81,16 @@ namespace Client
             this.gbInput.TabIndex = 3;
             this.gbInput.TabStop = false;
             // 
-            // output
+            // btnCancel
             // 
-            this.output.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.output.Location = new System.Drawing.Point(0, 88);
-            this.output.Name = "output";
-            this.output.ReadOnly = true;
-            this.output.Size = new System.Drawing.Size(423, 158);
-            this.output.TabIndex = 4;
-            this.output.Text = "";
+            this.btnCancel.Enabled = false;
+            this.btnCancel.Location = new System.Drawing.Point(15, 62);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.TabIndex = 4;
+            this.btnCancel.Text = "Отмена";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btSend
             // 
@@ -99,6 +102,16 @@ namespace Client
             this.btSend.Text = "Отправить";
             this.btSend.UseVisualStyleBackColor = true;
             this.btSend.Click += new System.EventHandler(this.btSend_Click);
+            // 
+            // output
+            // 
+            this.output.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.output.Location = new System.Drawing.Point(0, 88);
+            this.output.Name = "output";
+            this.output.ReadOnly = true;
+            this.output.Size = new System.Drawing.Size(423, 158);
+            this.output.TabIndex = 4;
+            this.output.Text = "";
             // 
             // MainForm
             // 
@@ -124,5 +137,6 @@ namespace Client
         private System.Windows.Forms.GroupBox gbInput;
         private System.Windows.Forms.RichTextBox output;
         private System.Windows.Forms.Button btSend;
+        private System.Windows.Forms.Button btnCancel;
     }
 }
