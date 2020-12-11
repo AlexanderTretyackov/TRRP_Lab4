@@ -75,33 +75,6 @@ namespace ServerSocket
                     handler.Close();
                 }
             }
-        }
-
-        private static string ReTry(string query, int count = 5, int startinterval = 1000)
-        {
-            string answer = "Error";
-            var exeptions = new HashSet<Exception>();
-            for (int attemptNum = 1; attemptNum <= count; attemptNum++)
-            {
-                try
-                {
-                    Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
-                                      $"{Thread.CurrentThread.Name} : " +
-                                      $"Try to connect. Attempt №{attemptNum}");
-                    answer = HelperClass.sendRequest(query);
-                    return answer;
-                }
-                catch (Exception ex)
-                {
-                    exeptions.Add(ex);
-                    Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
-                                      $"{Thread.CurrentThread.Name} :" +
-                                      ex.Message);
-                    Thread.Sleep(startinterval * attemptNum);
-                }
-            }
-
-            throw new AggregateException(exeptions);
-        }
+        }     
     }
 }
