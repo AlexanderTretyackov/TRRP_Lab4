@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace ServerSocket
 {
@@ -55,59 +54,5 @@ namespace ServerSocket
             return builder.ToArray();
         }
         #endregion
-
-        #region HTTP
-        public static T sendRequest<T>(string site,
-            string contentType = null,
-            bool authorization = false,
-            string method = WebRequestMethods.Http.Get,
-            byte[] body = null,
-            WebHeaderCollection header = null)
-        {
-            return JsonConvert.DeserializeObject<T>(sendRequest(site, contentType, authorization, method, body, header));
-        }
-
-        public static string sendRequest(string site,
-            string contentType = null,
-            bool authorization = false,
-            string method = WebRequestMethods.Http.Get,
-            byte[] body = null,
-            WebHeaderCollection header = null)
-        {
-            var request = HttpWebRequest.Create(site);
-
-            if (header != null)
-                request.Headers = header;
-
-            request.Method = method;
-
-            if (body != null)
-            {
-                using (var stream = request.GetRequestStream())
-                {
-                    stream.Write(body, 0, body.Length);
-                    stream.Flush();
-                    stream.Close();
-                }
-            }
-
-            if (authorization)
-                request.Headers[HttpRequestHeader.Authorization] = "Bearer ";
-
-            if (contentType != null)
-                request.ContentType = contentType;
-            var response = (HttpWebResponse)request.GetResponse();
-
-            string answerJson;
-
-            using (var reader = new StreamReader(response.GetResponseStream(), Encoding.ASCII))
-            {
-                answerJson = reader.ReadToEnd();
-            }
-
-            return answerJson;
-        }
-        #endregion
-
     }
 }

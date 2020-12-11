@@ -9,7 +9,7 @@ namespace Client
     public class Client
     {
         private static Socket socket = null;
-        private static readonly IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(HelperClass.address), HelperClass.port);
+        private static readonly IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse("192.168.0.3"), 5555);
 
         public Result SendSocket(int[,] matrix)
         {      

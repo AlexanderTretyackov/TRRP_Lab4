@@ -14,7 +14,7 @@ namespace ServerSocket
         static void Main(string[] args)
         {
             Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(HelperClass.address), HelperClass.port);
+            IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse("192.168.0.3"), 12345);
 
             // связываем сокет с локальной точкой, по которой будем принимать данные
             listenSocket.Bind(ipPoint);
