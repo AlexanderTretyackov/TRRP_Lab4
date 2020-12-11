@@ -41,7 +41,7 @@ namespace ServerSocket
             string message = "Error";
             try
             {
-                var graph = (int [,])HelperClass.ByteArrayToObject(HelperClass.RecieveMes(handler));
+                var graph = (int [,])HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(handler));
                 //string query = site + info + $"&mode={mode}";
                 var explicitSolver = new ExplicitAlgorytm(graph);
                 var vertexCover = explicitSolver.Solve();

@@ -11,53 +11,60 @@ namespace ServerSocket
 {
     class Program
     {
+        /// <summary>
+        /// Список адресов рабочих серверов
+        /// </summary>
         static List<IPEndPoint> serverEndpoints = new List<IPEndPoint>() 
         { 
             new IPEndPoint(IPAddress.Parse("192.168.0.3"), 12345),
         };
+        /// <summary>
+        /// Номер сервера, на который будет отправлен пришедший запрос
+        /// </summary>
         static int currentNumberServerEndpoint;
         static void Main(string[] args)
         {
+            //сокет для диспетчера
             Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse("192.168.0.3"), 5555);
             currentNumberServerEndpoint = 0;
 
             // связываем сокет с локальной точкой, по которой будем принимать данные
             listenSocket.Bind(ipPoint);            
-            // начинаем пsрослушивание
+            // начинаем прослушивание
             listenSocket.Listen(10);
             Console.WriteLine("Сервер запущен. Ожидание подключений...");
             int cnt = 0;
             while (true)
             {
-                var handler = listenSocket.Accept();
-                // создаем новый поток
+                var clientSocket = listenSocket.Accept();
+                // создаем поток для запроса
                 var myThread = new Thread(ReturnAnswer)
                 {
                     Name = cnt++.ToString()
                 };
-                myThread.Start(handler);
+                myThread.Start(clientSocket);
                 currentNumberServerEndpoint = currentNumberServerEndpoint >= serverEndpoints.Count() ?
                     currentNumberServerEndpoint = 0:
                     currentNumberServerEndpoint++;
             }
         }
        
-        private static void ReturnAnswer(object socket)
+        private static void ReturnAnswer(object clientSocket)
         {
-            var clientSoketHandler = socket as Socket;
+            var clientSoketHandler = clientSocket as Socket;
 
             try
             {
-                Socket serverSocket = null;
+                //создаем сокет для подключения к конкретному серверу
+                Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 IPEndPoint ipPoint = serverEndpoints[currentNumberServerEndpoint];
-
-                serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 // подключаемся к серверу
                 serverSocket.Connect(ipPoint);
                 //пересылаем данные клиента на сервер
-                serverSocket.Send(HelperClass.RecieveMes(clientSoketHandler));
-                var result = (Result)HelperClass.ByteArrayToObject(HelperClass.RecieveMes(serverSocket));
+                serverSocket.Send(HelperClass.RecieveMessage(clientSoketHandler));
+                //получаем данные от сервера
+                var result = (Result)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(serverSocket));
  
                 //return new Result
                 //{
@@ -68,6 +75,7 @@ namespace ServerSocket
                 Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
                                   $"{Thread.CurrentThread.Name} : " +
                                   $"The message is received");
+                //отправляем клиенту ответ от сервера
                 clientSoketHandler.Send(HelperClass.ObjectToByteArray(result));
             }
             catch (Exception ex)

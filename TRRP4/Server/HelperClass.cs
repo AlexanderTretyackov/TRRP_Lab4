@@ -9,9 +9,9 @@ namespace ServerSocket
 {
     public static class HelperClass
     {
-        public static int port = 8005;
+        //public static int port = 8005;
 
-        public static string address = "192.168.0.3";
+        //public static string address = "192.168.0.3";
 
         #region Сериализация
         public static byte[] ObjectToByteArray(object obj)
@@ -38,7 +38,7 @@ namespace ServerSocket
         #endregion
 
         #region Сокеты
-        public static byte[] RecieveMes(Socket socket)
+        public static byte[] RecieveMessage(Socket socket)
         {
             // получаем сообщение
             List<byte> builder = new List<byte>();

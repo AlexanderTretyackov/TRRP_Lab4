@@ -16,18 +16,18 @@ namespace Client
             try
             {
                 socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                // подключаемся к удаленному хосту
+                // подключаемся к диспетчеру
                 socket.Connect(ipPoint);
-                //Данные
+                //отправляем диспетчеру исходные данные для алгоритма
                 socket.Send(HelperClass.ObjectToByteArray(matrix));
-                return (Result)HelperClass.ByteArrayToObject(HelperClass.RecieveMes(socket));
+                return (Result)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
             }
             catch
             {
                 return new Result
                 {
                     Success = false,
-                    Message = "Извините, но на данный момент невозможно получить ответ",
+                    Message = "Не удалось получить ответ",
                 };
             }
         }
