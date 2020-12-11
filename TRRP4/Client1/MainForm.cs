@@ -47,6 +47,7 @@ namespace Client
             if (Graph != null)
             {
                 Result result = await Task.Run(() => _client.SendSocket(Graph));
+                output.Text = result.Message;               
             }
         }
     }

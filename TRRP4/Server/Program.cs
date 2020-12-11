@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using VertexCoverProblem;
 
 namespace ServerSocket
 {
@@ -40,9 +41,11 @@ namespace ServerSocket
             string message = "Error";
             try
             {
-                var matrix = (int [,])HelperClass.ByteArrayToObject(HelperClass.RecieveMes(handler));
+                var graph = (int [,])HelperClass.ByteArrayToObject(HelperClass.RecieveMes(handler));
                 //string query = site + info + $"&mode={mode}";
-
+                var explicitSolver = new ExplicitAlgorytm(graph);
+                var vertexCover = explicitSolver.Solve();
+                var answer = string.Join(",", vertexCover);
                 //message = ReTry(query);
                 Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
                                   $"{Thread.CurrentThread.Name} : " +
@@ -50,7 +53,7 @@ namespace ServerSocket
                 handler.Send(HelperClass.ObjectToByteArray(
                     new Result {
                         Success = true,
-                        Message = "1,2,3",
+                        Message = answer,
                     }));
             }
             catch (Exception ex)
