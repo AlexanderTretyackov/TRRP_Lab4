@@ -106,6 +106,7 @@ namespace Client
             // output
             // 
             this.output.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.output.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.output.Location = new System.Drawing.Point(0, 88);
             this.output.Name = "output";
             this.output.ReadOnly = true;
@@ -121,7 +122,7 @@ namespace Client
             this.Controls.Add(this.output);
             this.Controls.Add(this.gbInput);
             this.Name = "MainForm";
-            this.Text = "MainForm";
+            this.Text = "Вычисление точного вершинного покрытия";
             this.gbInput.ResumeLayout(false);
             this.gbInput.PerformLayout();
             this.ResumeLayout(false);
