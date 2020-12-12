@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Client
 {
-    class Reciver
+    public class Reciver
     {
         private readonly string ipAddress;
         private readonly int port;

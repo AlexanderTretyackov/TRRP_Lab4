@@ -13,12 +13,10 @@ namespace Client
     {
         public static ConcurrentDictionary<string, IPEndPoint> otherClients =
             new ConcurrentDictionary<string, IPEndPoint>();
-        public static bool loaded = false;
+        public static bool loaded = false;    
         public Client()
         {
             Task.Run(() => Greeting());
-            var reciever = new Reciver(GetLocalIP(), Configs.ClientPort);
-            Task.Run(() => reciever.BeginRecieve());
             Task.Run(() => Reconnect());
         }
 
@@ -29,7 +27,7 @@ namespace Client
             //socket = null;
         }
 
-        public int GetLocalNum()
+        public static int GetLocalNum()
         {
             string Host = Dns.GetHostName();
             int localNum = -1;
@@ -54,7 +52,7 @@ namespace Client
             return localNum;
         }
 
-        public string GetLocalIP()
+        public static string GetLocalIP()
         {
             string Host = Dns.GetHostName();
             var adressList = Dns.GetHostByName(Host).AddressList;
@@ -174,12 +172,59 @@ namespace Client
             return 0;
         }
 
+        public bool StartWorking()
+        {
+            Socket socket = null;
+            string ipAddress = "10.147.20.151";
+            int port = 8000;
+            try
+            {
+                IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                // подключаемся к другому клиенту
+
+                IAsyncResult result = socket.BeginConnect(ipAddress, port, null, null);
+
+                bool success = result.AsyncWaitHandle.WaitOne(1000, true);
+
+                if (socket.Connected)
+                {
+                    socket.EndConnect(result);
+                    //отправляем клиенту приветствие
+                    socket.Send(HelperClass.ObjectToByteArray(
+                        new Message
+                        {
+                            Command = Command.Work,
+                            Data = new MessageData
+                            {
+                                A = 123
+                            }
+                        }));
+
+                    return (bool)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
+                }
+                else
+                {
+                    socket.Close();
+                    throw new ApplicationException("Failed to connect");
+                }
+            }
+            catch
+            {
+                Console.WriteLine($"stop working{socket.RemoteEndPoint}");
+                socket.Close();
+                return false;
+            }
+        }
+
         /// <summary>
         /// Отправляет приветствие другому клиенту
         /// </summary>
         /// <param name="ipAddress">ip адрес другого клиента</param>
         /// <param name="port">порт на котором работает другой клиент</param>
         /// <returns></returns>
+        /// 
+
         public bool SendHelloToClient(string ipAddress, int port)
         {
             Socket socket = null;

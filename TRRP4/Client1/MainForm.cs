@@ -8,15 +8,25 @@ namespace Client
     public partial class MainForm : Form
     {
         public delegate void InvokeDelegate();
-        Client _client = new Client();
+        readonly Client _client;
+
         public MainForm()
         {
             InitializeComponent();
+            _client = new Client();
             Task.Run(() => Loading());
+            var reciever = new Reciver(Client.GetLocalIP(), Configs.ClientPort);
+            Task.Run(() => reciever.BeginRecieve());
         }
 
-        private async void btSend_Click(object sender, EventArgs e)
+        private void btSend_Click(object sender, EventArgs e)
         {
+            Task.Run(() => {
+                var answer = _client.StartWorking();
+                output.BeginInvoke(new InvokeDelegate(
+                () => { output.Text = $"Полученный ответ: {answer}"; }));
+            });
+            
             //btSend.Enabled = false;
             //btnCancel.Enabled = true;
             //Result result = await Task.Run(() => _client.SendSocket(Graph));
