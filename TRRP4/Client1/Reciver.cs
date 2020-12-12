@@ -69,6 +69,18 @@ namespace Client
                         clientSocket.Send(HelperClass.ObjectToByteArray(false));
                     else
                     {
+                        var random = new Random();
+
+                        Thread.Sleep(10000);
+                        clientSocket.Send(HelperClass.ObjectToByteArray(
+                            new Message 
+                            {
+                                Command = Command.Work,
+                                Data = new MessageData
+                                {
+                                    A = 777,
+                                } 
+                            }));
                         Form.output.BeginInvoke(new InvokeDelegate(
                             () => { Form.output.Text = $"Загружено, найдено клиентов в сети {Client.otherClients.Count}"; }));
                     }

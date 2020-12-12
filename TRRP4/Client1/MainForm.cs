@@ -44,7 +44,11 @@ namespace Client
                 Thread.Sleep(1000);
             }
             output.BeginInvoke(new InvokeDelegate(
-                () => { output.Text = $"Загружено, найдено клиентов в сети {Client.otherClients.Count}"; }));
+                () => { 
+                    output.Text = $"Загружено, найдено клиентов в сети {Client.otherClients.Count}";
+                    output.Visible = info.Visible = true;
+                    lbLoading.Visible = false;
+                }));                    
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
