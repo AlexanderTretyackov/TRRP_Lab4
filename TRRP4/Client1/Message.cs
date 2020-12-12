@@ -9,7 +9,7 @@ namespace Client
         Work
     }
     [Serializable]
-    class Message
+    public class Message
     {
         public Command Command { get; set; }
         public MessageData Data { get; set; }
