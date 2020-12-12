@@ -13,7 +13,7 @@ namespace Client
     {
         public static ConcurrentDictionary<string, IPEndPoint> otherClients =
             new ConcurrentDictionary<string, IPEndPoint>();
-        public static bool loaded = false;    
+        public static bool loaded = false;
         public Client()
         {
             Task.Run(() => Greeting());
@@ -131,7 +131,7 @@ namespace Client
                     otherClients.TryRemove(ip.ToString(), out iPEndPoint);
                     Console.WriteLine($"УДАЛЕН {ip}");
                 }
-                    
+
             }
             catch
             {

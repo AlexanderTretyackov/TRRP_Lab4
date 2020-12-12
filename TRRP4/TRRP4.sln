@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dispatcher", "ServerSocket\Dispatcher.csproj", "{79E18645-DA79-4202-84A6-617E8101EBB8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{069135D7-ABAB-440B-BFA9-A0F0CF5CD012}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client1\Client.csproj", "{3C235DFA-41AE-4F77-B338-1E5B4A81B9C5}"
 EndProject
 Global
@@ -15,14 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{79E18645-DA79-4202-84A6-617E8101EBB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79E18645-DA79-4202-84A6-617E8101EBB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79E18645-DA79-4202-84A6-617E8101EBB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79E18645-DA79-4202-84A6-617E8101EBB8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{069135D7-ABAB-440B-BFA9-A0F0CF5CD012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{069135D7-ABAB-440B-BFA9-A0F0CF5CD012}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{069135D7-ABAB-440B-BFA9-A0F0CF5CD012}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{069135D7-ABAB-440B-BFA9-A0F0CF5CD012}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3C235DFA-41AE-4F77-B338-1E5B4A81B9C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3C235DFA-41AE-4F77-B338-1E5B4A81B9C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C235DFA-41AE-4F77-B338-1E5B4A81B9C5}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -14,7 +14,7 @@ namespace Client
         public Reciver(string ipAddress, int port)
         {
             this.ipAddress = ipAddress;
-            this.port = port;        
+            this.port = port;
         }
 
         public void BeginRecieve()
@@ -45,7 +45,7 @@ namespace Client
         private static void ReturnAnswer(object socket)
         {
             var clientSocket = socket as Socket;
-       
+
             try
             {
                 var message = (Message)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(clientSocket));

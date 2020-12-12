@@ -21,12 +21,13 @@ namespace Client
 
         private void btSend_Click(object sender, EventArgs e)
         {
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 var answer = _client.StartWorking();
                 output.BeginInvoke(new InvokeDelegate(
                 () => { output.Text = $"Полученный ответ: {answer}"; }));
             });
-            
+
             //btSend.Enabled = false;
             //btnCancel.Enabled = true;
             //Result result = await Task.Run(() => _client.SendSocket(Graph));
