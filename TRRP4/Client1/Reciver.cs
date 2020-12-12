@@ -19,10 +19,10 @@ namespace Client
         {
             this.ipAddress = ipAddress;
             this.port = port;
-            Task.Run(() => Recieve());
+            
         }
 
-        void Recieve()
+        public void BeginRecieve()
         {
             //создаем сокет для прослушивания запросов других клиентов
             Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -33,7 +33,7 @@ namespace Client
 
             // начинаем прослушивание приветствия других клиентов
             listenSocket.Listen(10);
-            Console.WriteLine("Сервер запущен. Ожидание подключений...");
+            Console.WriteLine("Клиент ожидает подключения других клиентов...");
             int cnt = 0;
             while (true)
             {

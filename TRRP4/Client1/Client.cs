@@ -5,16 +5,19 @@ using System.Net.Sockets;
 using Server;
 using ServerSocket;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Client
 {
     public class Client
     {
-        private static Socket socket = null;
         static ConcurrentBag<IPEndPoint> otherClients = new ConcurrentBag<IPEndPoint>();
         public Client()
         {
             Greeting();
+
+            var reciever = new Reciver(GetLocalIP(), Configs.ClientPort);
+            Task.Run(() => reciever.BeginRecieve());
         }
 
         public void Cancel()
@@ -49,11 +52,32 @@ namespace Client
             return localNum;
         }
 
+        public string GetLocalIP()
+        {
+            string Host = Dns.GetHostName();
+            var adressList = Dns.GetHostByName(Host).AddressList;
+
+            try
+            {
+                foreach (var adress in adressList)
+                {
+                    if (adress.ToString().Contains(Configs.Mask))
+                        return adress.ToString();
+                }
+            }
+            catch (Exception)
+            {
+                return $"{Configs.Mask}{GetLocalNum()}";
+            }
+
+            return Configs.LocalHost;
+        }
+
 
 
 
         /// <summary>
-        /// 
+        /// Здороваемся со всеми клиентами в сети
         /// </summary>
         public void Greeting()
         {
@@ -82,7 +106,12 @@ namespace Client
             return 0;
         }
 
-
+        /// <summary>
+        /// Отправляет приветствие другому клиенту
+        /// </summary>
+        /// <param name="ipAddress">ip адрес другого клиента</param>
+        /// <param name="port">порт на котором работает другой клиент</param>
+        /// <returns></returns>
         public bool SendHelloToClient(string ipAddress, int port)
         {
             try
@@ -93,7 +122,10 @@ namespace Client
                 // подключаемся к другому клиенту
                 socket.Connect(ipPoint);
                 //отправляем клиенту приветствие
-                socket.Send(HelperClass.ObjectToByteArray("hello"));
+                socket.Send(HelperClass.ObjectToByteArray(
+                    new Message { 
+                        Command = Command.Greeting 
+                    }));
                 //
                 return (bool)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
             }

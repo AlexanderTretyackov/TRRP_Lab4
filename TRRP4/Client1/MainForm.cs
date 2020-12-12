@@ -21,12 +21,12 @@ namespace Client
 
         private async void btSend_Click(object sender, EventArgs e)
         {
-            btSend.Enabled = false;
-            btnCancel.Enabled = true;
-            Result result = await Task.Run(() => _client.SendSocket(Graph));
-            output.Text = result.Message;
-            btnCancel.Enabled = false;
-            btSend.Enabled = true;
+            //btSend.Enabled = false;
+            //btnCancel.Enabled = true;
+            //Result result = await Task.Run(() => _client.SendSocket(Graph));
+            //output.Text = result.Message;
+            //btnCancel.Enabled = false;
+            //btSend.Enabled = true;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
