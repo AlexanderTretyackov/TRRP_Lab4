@@ -7,11 +7,12 @@ namespace Client
 {
     public partial class MainForm : Form
     {
+        public delegate void InvokeDelegate();
         Client _client = new Client();
         public MainForm()
         {
             InitializeComponent();
-            Loading();
+            Task.Run(() => Loading());
         }
 
         private async void btSend_Click(object sender, EventArgs e)
@@ -24,13 +25,13 @@ namespace Client
             //btSend.Enabled = true;
         }
 
-        private async void Loading()
+        private void Loading()
         {
             while (!Client.loaded)
             {
                 Thread.Sleep(1000);
             }
-            output.Text = "Loaded";
+            output.BeginInvoke(new InvokeDelegate(() => { output.Text = $"Загружено {Client.otherClients.Count}"; }));
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -38,5 +39,6 @@ namespace Client
             _client.Cancel();
             btSend.Enabled = true;
         }
+
     }
 }
