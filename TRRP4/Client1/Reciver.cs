@@ -58,7 +58,8 @@ namespace Client
                 if (message.Command == Command.Greeting)
                 {
                     clientSocket.Send(HelperClass.ObjectToByteArray(true));
-                    Client.otherClients.Add((IPEndPoint)clientSocket.RemoteEndPoint);
+                    var clientIpEndPoint = (IPEndPoint)clientSocket.RemoteEndPoint;
+                    Client.otherClients.TryAdd(clientIpEndPoint.Address.ToString(), clientIpEndPoint);
                 }
             }
             catch (Exception ex)

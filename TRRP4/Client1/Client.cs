@@ -10,7 +10,8 @@ namespace Client
 {
     public class Client
     {
-        public static ConcurrentBag<IPEndPoint> otherClients = new ConcurrentBag<IPEndPoint>();
+        public static ConcurrentDictionary<string, IPEndPoint> otherClients = 
+            new ConcurrentDictionary<string, IPEndPoint>();
         public static bool loaded = false;
         public Client()
         {
@@ -106,7 +107,7 @@ namespace Client
                 bool result = SendHelloToClient(ip.ToString(), Configs.ClientPort);
 
                 if (result)
-                    otherClients.Add(
+                    otherClients.TryAdd(ip.ToString(),
                         new IPEndPoint(ip, Configs.ClientPort));
             }
             catch
