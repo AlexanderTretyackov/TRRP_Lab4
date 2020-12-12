@@ -21,7 +21,7 @@ namespace Client
         {
             //создаем сокет для прослушивания запросов других клиентов
             Socket listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(Configs.LocalHost), Configs.ClientPort);
+            IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
 
             // связываем сокет с локальной точкой, по которой будем приветствия от других клиентов
             listenSocket.Bind(ipPoint);
