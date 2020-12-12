@@ -109,7 +109,7 @@ namespace Client
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox gbInput;
-        private System.Windows.Forms.RichTextBox output;
+        public System.Windows.Forms.RichTextBox output;
         private System.Windows.Forms.Button btSend;
         private System.Windows.Forms.Button btnCancel;
     }

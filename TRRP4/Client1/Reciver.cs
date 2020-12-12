@@ -10,7 +10,9 @@ namespace Client
     {
         private readonly string ipAddress;
         private readonly int port;
-
+        public static bool InProgress = false;
+        public delegate void InvokeDelegate();
+        public static MainForm Form;
         public Reciver(string ipAddress, int port)
         {
             this.ipAddress = ipAddress;
@@ -60,6 +62,16 @@ namespace Client
                     clientSocket.Send(HelperClass.ObjectToByteArray(true));
                     var clientIpEndPoint = (IPEndPoint)clientSocket.RemoteEndPoint;
                     Client.otherClients.TryAdd(clientIpEndPoint.Address.ToString(), clientIpEndPoint);
+                }
+                else
+                {
+                    if(InProgress)
+                        clientSocket.Send(HelperClass.ObjectToByteArray(false));
+                    else
+                    {
+                        Form.output.BeginInvoke(new InvokeDelegate(
+                            () => { Form.output.Text = $"Загружено, найдено клиентов в сети {Client.otherClients.Count}"; }));
+                    }
                 }
             }
             catch (Exception ex)

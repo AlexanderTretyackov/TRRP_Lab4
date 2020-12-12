@@ -9,13 +9,14 @@ namespace Client
     {
         public delegate void InvokeDelegate();
         readonly Client _client;
-
+        readonly Reciver reciever;
         public MainForm()
         {
             InitializeComponent();
             _client = new Client();
             Task.Run(() => Loading());
-            var reciever = new Reciver(Client.GetLocalIP(), Configs.ClientPort);
+            reciever = new Reciver(Client.GetLocalIP(), Configs.ClientPort);   
+            Reciver.Form = this;
             Task.Run(() => reciever.BeginRecieve());
         }
 
