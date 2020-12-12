@@ -1,10 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using Server;
-using ServerSocket;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
@@ -13,6 +11,7 @@ namespace Client
     public class Client
     {
         public static ConcurrentBag<IPEndPoint> otherClients = new ConcurrentBag<IPEndPoint>();
+        public static bool loaded = false;
         public Client()
         {
             Task.Run(() => Greeting());
@@ -113,6 +112,11 @@ namespace Client
             catch
             {
                 Console.WriteLine("catch ex");
+            }
+            finally
+            {
+                if (ip.ToString() == $"{Configs.Mask}255")
+                    loaded = true;
             }
         }
 

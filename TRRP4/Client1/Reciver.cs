@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Client
 {
@@ -54,7 +50,7 @@ namespace Client
             {
                 var message = (Message)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(clientSocket));
                 //string query = site + info + $"&mode={mode}";
-                
+
                 //message = ReTry(query);
                 Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
                                   $"{Thread.CurrentThread.Name} : " +
