@@ -71,7 +71,6 @@ namespace Client
             // 
             // btSend
             // 
-            this.btSend.Enabled = false;
             this.btSend.Location = new System.Drawing.Point(340, 62);
             this.btSend.Name = "btSend";
             this.btSend.Size = new System.Drawing.Size(75, 20);

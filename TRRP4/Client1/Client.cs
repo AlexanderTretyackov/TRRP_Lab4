@@ -6,16 +6,16 @@ using Server;
 using ServerSocket;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Client
 {
     public class Client
     {
-        static ConcurrentBag<IPEndPoint> otherClients = new ConcurrentBag<IPEndPoint>();
+        public static ConcurrentBag<IPEndPoint> otherClients = new ConcurrentBag<IPEndPoint>();
         public Client()
         {
-            Greeting();
-
+            Task.Run(() => Greeting());
             var reciever = new Reciver(GetLocalIP(), Configs.ClientPort);
             Task.Run(() => reciever.BeginRecieve());
         }
@@ -74,26 +74,63 @@ namespace Client
         }
 
 
-
-
         /// <summary>
         /// Здороваемся со всеми клиентами в сети
         /// </summary>
         public void Greeting()
         {
+            var list = GenerateIPAddressList();
+
+            // start the work load
+            DoWorkLoads(list).Wait();
+        }
+
+        public List<IPAddress> GenerateIPAddressList()
+        {
             int localNum = GetLocalNum();
-            bool result = SendHelloToClient("10.147.20.151", Configs.ClientPort);
-            //for (int i = 0; i < 256; i++)
-            //{
-            //    if (i == localNum) continue;
-            //    var address = $"{Configs.Mask}{i}";
+            var addresses = new List<IPAddress>();
+            for (int i = 0; i < 256; i++)
+            {
+                if (i == localNum) continue;
+                var address = $"{Configs.Mask}{i}";
+                addresses.Add(IPAddress.Parse(address));
+            }
+            return addresses;
+        }
 
-            //    bool result = SendHelloToClient(address, Configs.ClientPort);
+        public async Task TestSocket(IPAddress ip)
+        {
+            try
+            {
+                Console.WriteLine("testing : " + ip);
 
-            //    if (result)
-            //        otherClients.Add(
-            //            new IPEndPoint(IPAddress.Parse(address), Configs.ClientPort));
-            //}
+                bool result = SendHelloToClient(ip.ToString(), Configs.ClientPort);
+
+                if (result)
+                    otherClients.Add(
+                        new IPEndPoint(ip, Configs.ClientPort));
+            }
+            catch
+            {
+                Console.WriteLine("catch ex");
+            }
+        }
+
+        public async Task DoWorkLoads(List<IPAddress> addresses)
+        {
+            var options = new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = 255
+            };
+
+            var block = new ActionBlock<IPAddress>(TestSocket, options);
+
+            foreach (var ip in addresses)
+                block.Post(ip);
+
+            block.Complete();
+            await block.Completion;
+
         }
 
         public int BruteForce(int start, int end)
@@ -125,18 +162,20 @@ namespace Client
 
                 IAsyncResult result = socket.BeginConnect(ipAddress, port, null, null);
 
-                bool success = result.AsyncWaitHandle.WaitOne(5000, true);
+                bool success = result.AsyncWaitHandle.WaitOne(1000, true);
 
                 if (socket.Connected)
                 {
                     socket.EndConnect(result);
                     //отправляем клиенту приветствие
-                    Console.WriteLine("sas");
                     socket.Send(HelperClass.ObjectToByteArray(
                         new Message
                         {
                             Command = Command.Greeting,
-                            Data = null
+                            Data = new MessageData
+                            {
+                                A = 123
+                            }
                         }));
 
                     return (bool)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
