@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
@@ -10,7 +11,7 @@ namespace Client
 {
     public class Client
     {
-        public static ConcurrentDictionary<string, IPEndPoint> otherClients = 
+        public static ConcurrentDictionary<string, IPEndPoint> otherClients =
             new ConcurrentDictionary<string, IPEndPoint>();
         public static bool loaded = false;
         public Client()
@@ -18,6 +19,7 @@ namespace Client
             Task.Run(() => Greeting());
             var reciever = new Reciver(GetLocalIP(), Configs.ClientPort);
             Task.Run(() => reciever.BeginRecieve());
+            Task.Run(() => Reconnect());
         }
 
         public void Cancel()
@@ -75,8 +77,24 @@ namespace Client
 
 
         /// <summary>
+        /// переподключаемся
+        /// </summary>
+        public void Reconnect()
+        {
+            while (true)
+            {
+                List<IPAddress> list = new List<IPAddress>();
+                foreach (var client in otherClients.Keys)
+                    list.Add(IPAddress.Parse(client));
+                DoWorkLoads(list).Wait();
+                Thread.Sleep(5000);
+            }
+        }
+
+        /// <summary>
         /// Здороваемся со всеми клиентами в сети
         /// </summary>
+        /// 
         public void Greeting()
         {
             var list = GenerateIPAddressList();
@@ -109,6 +127,13 @@ namespace Client
                 if (result)
                     otherClients.TryAdd(ip.ToString(),
                         new IPEndPoint(ip, Configs.ClientPort));
+                else
+                {
+                    IPEndPoint iPEndPoint;
+                    otherClients.TryRemove(ip.ToString(), out iPEndPoint);
+                    Console.WriteLine($"УДАЛЕН {ip}");
+                }
+                    
             }
             catch
             {

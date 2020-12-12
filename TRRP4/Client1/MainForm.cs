@@ -31,7 +31,8 @@ namespace Client
             {
                 Thread.Sleep(1000);
             }
-            output.BeginInvoke(new InvokeDelegate(() => { output.Text = $"Загружено {Client.otherClients.Count}"; }));
+            output.BeginInvoke(new InvokeDelegate(
+                () => { output.Text = $"Загружено, найдено клиентов в сети {Client.otherClients.Count}"; }));
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
