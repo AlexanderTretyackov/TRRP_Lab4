@@ -15,7 +15,7 @@ namespace Client
             InitializeComponent();
             _client = new Client();
             Task.Run(() => Loading());
-            reciever = new Reciver(Client.GetLocalIP(), Configs.ClientPort);   
+            reciever = new Reciver(Client.GetLocalIP(), Configs.ClientPort);
             Reciver.Form = this;
             Task.Run(() => reciever.BeginRecieve());
         }
@@ -25,8 +25,11 @@ namespace Client
             Task.Run(() =>
             {
                 var answer = _client.StartWorking();
+                string strAnswer = "Не удалось получить ответ на задачу";
+                if (answer != null)
+                    strAnswer = $"Полученный ответ: {answer.Data.A}";
                 output.BeginInvoke(new InvokeDelegate(
-                () => { output.Text = $"Полученный ответ: {answer}"; }));
+                () => { output.Text = strAnswer; }));
             });
 
             //btSend.Enabled = false;
@@ -44,11 +47,12 @@ namespace Client
                 Thread.Sleep(1000);
             }
             output.BeginInvoke(new InvokeDelegate(
-                () => { 
+                () =>
+                {
                     output.Text = $"Загружено, найдено клиентов в сети {Client.otherClients.Count}";
                     output.Visible = info.Visible = true;
                     lbLoading.Visible = false;
-                }));                    
+                }));
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

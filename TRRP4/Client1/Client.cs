@@ -172,7 +172,7 @@ namespace Client
             return 0;
         }
 
-        public bool StartWorking()
+        public Message StartWorking()
         {
             Socket socket = null;
             string ipAddress = "10.147.20.151";
@@ -201,7 +201,7 @@ namespace Client
                             }
                         }));
 
-                    return (bool)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
+                    return (Message)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
                 }
                 else
                 {
@@ -213,7 +213,7 @@ namespace Client
             {
                 Console.WriteLine($"stop working{socket.RemoteEndPoint}");
                 socket.Close();
-                return false;
+                return null;
             }
         }
 
