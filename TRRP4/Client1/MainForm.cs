@@ -1,11 +1,4 @@
-﻿using Server;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,7 +11,7 @@ namespace Client
         public MainForm()
         {
             InitializeComponent();
-            Task.Run(() => Loading());
+            Loading();
         }
 
         private async void btSend_Click(object sender, EventArgs e)
@@ -31,13 +24,13 @@ namespace Client
             //btSend.Enabled = true;
         }
 
-        private void Loading()
+        private async void Loading()
         {
-            while(!Client.loaded)
+            while (!Client.loaded)
             {
                 Thread.Sleep(1000);
             }
-            output.Text = "LOADED";
+            output.Text = "Loaded";
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

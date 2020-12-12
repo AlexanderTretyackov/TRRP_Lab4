@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Client
 {
@@ -19,7 +15,7 @@ namespace Client
         {
             this.ipAddress = ipAddress;
             this.port = port;
-            
+
         }
 
         public void BeginRecieve()
@@ -50,17 +46,17 @@ namespace Client
         private static void ReturnAnswer(object socket)
         {
             var handler = socket as Socket;
-       
+
             try
             {
                 var message = (Message)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(handler));
                 //string query = site + info + $"&mode={mode}";
-                
+
                 //message = ReTry(query);
                 Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
                                   $"{Thread.CurrentThread.Name} : " +
                                   $"The message is received");
-                if(message.Command == Command.Greeting)
+                if (message.Command == Command.Greeting)
                     handler.Send(HelperClass.ObjectToByteArray(true));
             }
             catch (Exception ex)
