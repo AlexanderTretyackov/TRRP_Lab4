@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-
+    [Serializable]
     public enum Command{
         Greeting,
         Work
     }
+    [Serializable]
     class Message
     {
         public Command Command { get; set; }

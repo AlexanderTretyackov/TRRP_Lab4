@@ -82,17 +82,18 @@ namespace Client
         public void Greeting()
         {
             int localNum = GetLocalNum();
-            for (int i = 0; i < 256; i++)
-            {
-                if (i == localNum) continue;
-                var address = $"{Configs.Mask}{i}";
+            bool result = SendHelloToClient("10.147.20.151", Configs.ClientPort);
+            //for (int i = 0; i < 256; i++)
+            //{
+            //    if (i == localNum) continue;
+            //    var address = $"{Configs.Mask}{i}";
 
-                bool result = SendHelloToClient(address, Configs.ClientPort);
+            //    bool result = SendHelloToClient(address, Configs.ClientPort);
 
-                if (result)
-                    otherClients.Add(
-                        new IPEndPoint(IPAddress.Parse(address), Configs.ClientPort));
-            }
+            //    if (result)
+            //        otherClients.Add(
+            //            new IPEndPoint(IPAddress.Parse(address), Configs.ClientPort));
+            //}
         }
 
         public int BruteForce(int start, int end)
@@ -114,23 +115,41 @@ namespace Client
         /// <returns></returns>
         public bool SendHelloToClient(string ipAddress, int port)
         {
+            Socket socket = null;
+
             try
             {
-                Socket socket = null;
                 IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
                 socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 // подключаемся к другому клиенту
-                socket.Connect(ipPoint);
-                //отправляем клиенту приветствие
-                socket.Send(HelperClass.ObjectToByteArray(
-                    new Message { 
-                        Command = Command.Greeting 
-                    }));
-                //
-                return (bool)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
+
+                IAsyncResult result = socket.BeginConnect(ipAddress, port, null, null);
+
+                bool success = result.AsyncWaitHandle.WaitOne(5000, true);
+
+                if (socket.Connected)
+                {
+                    socket.EndConnect(result);
+                    //отправляем клиенту приветствие
+                    Console.WriteLine("sas");
+                    socket.Send(HelperClass.ObjectToByteArray(
+                        new Message
+                        {
+                            Command = Command.Greeting,
+                            Data = null
+                        }));
+
+                    return (bool)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
+                }
+                else
+                {
+                    socket.Close();
+                    throw new ApplicationException("Failed to connect");
+                }
             }
             catch
             {
+                socket.Close();
                 return false;
             }
         }
