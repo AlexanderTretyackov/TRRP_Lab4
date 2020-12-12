@@ -18,8 +18,7 @@ namespace Client
         public Reciver(string ipAddress, int port)
         {
             this.ipAddress = ipAddress;
-            this.port = port;
-            
+            this.port = port;        
         }
 
         public void BeginRecieve()
@@ -37,31 +36,34 @@ namespace Client
             int cnt = 0;
             while (true)
             {
-                var handler = listenSocket.Accept();
+                var clientSocket = listenSocket.Accept();
                 // создаем новый поток
                 var myThread = new Thread(ReturnAnswer)
                 {
                     Name = cnt++.ToString()
                 };
-                myThread.Start(handler);
+                myThread.Start(clientSocket);
             }
         }
 
         private static void ReturnAnswer(object socket)
         {
-            var handler = socket as Socket;
+            var clientSocket = socket as Socket;
        
             try
             {
-                var message = (Message)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(handler));
+                var message = (Message)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(clientSocket));
                 //string query = site + info + $"&mode={mode}";
                 
                 //message = ReTry(query);
                 Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
                                   $"{Thread.CurrentThread.Name} : " +
                                   $"The message is received");
-                if(message.Command == Command.Greeting)
-                    handler.Send(HelperClass.ObjectToByteArray(true));
+                if (message.Command == Command.Greeting)
+                {
+                    clientSocket.Send(HelperClass.ObjectToByteArray(true));
+                    Client.otherClients.Add((IPEndPoint)clientSocket.RemoteEndPoint);
+                }
             }
             catch (Exception ex)
             {
@@ -75,11 +77,11 @@ namespace Client
 
             finally
             {
-                if (handler != null && handler.Connected)
+                if (clientSocket != null && clientSocket.Connected)
                 {
                     // закрываем сокет
-                    handler.Shutdown(SocketShutdown.Both);
-                    handler.Close();
+                    clientSocket.Shutdown(SocketShutdown.Both);
+                    clientSocket.Close();
                 }
             }
         }
