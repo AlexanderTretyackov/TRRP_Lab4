@@ -6,5 +6,6 @@ namespace Client
     public class MessageData
     {
         public int A { get; set; }
+        public int B { get; set; }
     }
 }

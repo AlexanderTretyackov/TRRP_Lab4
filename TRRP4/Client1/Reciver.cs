@@ -10,7 +10,6 @@ namespace Client
     {
         private readonly string ipAddress;
         private readonly int port;
-        public static bool InProgress = false;
         public delegate void InvokeDelegate();
         public static MainForm Form;
         public Reciver(string ipAddress, int port)
@@ -57,32 +56,31 @@ namespace Client
                 Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
                                   $"{Thread.CurrentThread.Name} : " +
                                   $"The message is received");
+                //если пришло сообщение от другого клиента с приветсвием
                 if (message.Command == Command.Greeting)
                 {
                     clientSocket.Send(HelperClass.ObjectToByteArray(true));
                     var clientIpEndPoint = (IPEndPoint)clientSocket.RemoteEndPoint;
                     Client.otherClients.TryAdd(clientIpEndPoint.Address.ToString(), clientIpEndPoint);
                 }
-                else
+                //если пришло сообщение от другого клиента с просьбой решить подзадачу
+                if (message.Command == Command.Work)
                 {
-                    if(InProgress)
-                        clientSocket.Send(HelperClass.ObjectToByteArray(false));
+                    //если этот клиент уже решает какую-то подзадачу, то говорим, 
+                    //что не можем пока брать на выполнение новую подзадачу
+                    if (Worker.IsBusy)
+                        clientSocket.Send(HelperClass.ObjectToByteArray(
+                            new Answer
+                            {
+                                DoneWork = false,
+                            }));
+                    //иначе начинаем решать новую подзадачу
                     else
                     {
-                        var random = new Random();
-
-                        Thread.Sleep(10000);
-                        clientSocket.Send(HelperClass.ObjectToByteArray(
-                            new Message 
-                            {
-                                Command = Command.Work,
-                                Data = new MessageData
-                                {
-                                    A = 777,
-                                } 
-                            }));
-                        Form.output.BeginInvoke(new InvokeDelegate(
-                            () => { Form.output.Text = $"Загружено, найдено клиентов в сети {Client.otherClients.Count}"; }));
+                        //начинаем решать подзадачу
+                        var answer = Worker.DoWork(message.Data);
+                        //отправляем ответ на подзадачу
+                        clientSocket.Send(HelperClass.ObjectToByteArray(answer));
                     }
                 }
             }
@@ -91,6 +89,7 @@ namespace Client
                 Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
                                   $"{Thread.CurrentThread.Name} :" +
                                   ex.Message);
+                Worker.IsBusy = false;
                 //message = "Извените, но на данный момент невозможно получить ответ";
                 //if (handler != null && handler.Connected)
                 //    handler.Send(HelperClass.ObjectToByteArray(message));
@@ -106,6 +105,5 @@ namespace Client
                 }
             }
         }
-
     }
 }

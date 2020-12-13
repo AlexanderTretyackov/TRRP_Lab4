@@ -6,14 +6,38 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using static Client.MainForm;
 
 namespace Client
 {
     public class Client
     {
+        /// <summary>
+        /// Уровень сложности задачи, решаемой клиентами
+        /// </summary>
+        const int levelTask = 10000;
         public static ConcurrentDictionary<string, IPEndPoint> otherClients =
             new ConcurrentDictionary<string, IPEndPoint>();
+        /// <summary>
+        /// Словарь клиентов, которые выполняют на данный момент задания с исходными данными MessageData
+        /// </summary>
+        public static ConcurrentDictionary<string, MessageData> clientsWorks =
+            new ConcurrentDictionary<string, MessageData>();
+        /// <summary>
+        /// Ответы на подзадачи
+        /// </summary>
+        public static ConcurrentBag<int> answersValues =
+            new ConcurrentBag<int>();
+        /// <summary>
+        /// Количество частей на которые поделили работу
+        /// </summary>
+        int countPartsWork;
+        /// <summary>
+        /// Количество частей работы которые остались не отданными, будем решать сами
+        /// </summary>
+        int countPartsWorkForMe;
         public static bool loaded = false;
+
         public Client()
         {
             Task.Run(() => Greeting());
@@ -51,7 +75,10 @@ namespace Client
 
             return localNum;
         }
-
+        /// <summary>
+        /// Получает ip адрес компьютера в локальной сети
+        /// </summary>
+        /// <returns></returns>
         public static string GetLocalIP()
         {
             string Host = Dns.GetHostName();
@@ -224,7 +251,6 @@ namespace Client
         /// <param name="port">порт на котором работает другой клиент</param>
         /// <returns></returns>
         /// 
-
         public bool SendHelloToClient(string ipAddress, int port)
         {
             Socket socket = null;
@@ -265,6 +291,109 @@ namespace Client
             {
                 socket.Close();
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Распределяем работу между доступными клиентами
+        /// </summary>
+        public void DistributeWork()
+        {
+            //вычисляем часть задачи, которая будет выдана для решения другим клиентам
+            //при этом себя тоже учитываем как исполнителя
+            var partOfWork = levelTask / (otherClients.Count + 1);
+            countPartsWork = otherClients.Count + 1;
+            int a = 0;
+            foreach (var client in otherClients)
+            { 
+                SendPartWorkToClient(client.Key, Configs.ClientPort,
+                    new MessageData
+                    {
+                        A = a,
+                        B = a + partOfWork,
+                    });
+                a += partOfWork;
+            }
+            //начинаем сами решать свою часть задачи
+            RunPartOwnWork(new MessageData
+            {
+                A = a,
+                B = a + partOfWork,
+            });
+
+            Task.Run(() => {
+                //ждем пока не выполнятся все задачи
+                while (countPartsWork != answersValues.Count) { }
+                CurrentForm.output.BeginInvoke(
+                    new InvokeDelegate(
+                () => {
+                    var result = 0;
+                    foreach (var answerValue in answersValues)
+                        result += answerValue;
+                    CurrentForm.output.Text = $"Задача успешно решена, контрольная сумма{result}/{levelTask}";                   
+                }));
+            });
+        }
+
+        /// <summary>
+        /// Запускаем решение части задачи у себя
+        /// </summary>
+        void RunPartOwnWork(MessageData messageData)
+        {
+            Task.Run(() =>
+            {
+                var answer = Worker.DoWork(messageData);
+                answersValues.Add(answer.Value);
+            });
+        }
+
+        /// <summary>
+        /// Просим другого клиента выполнить часть работы
+        /// </summary>
+        /// <param name="ipAddress">ip адрес другого клиента</param>
+        /// <param name="port">Порт другого клиента</param>
+        /// <param name="messageData">Часть работы</param>
+        void SendPartWorkToClient(string ipAddress, int port, MessageData messageData)
+        {
+            Socket socket = null;
+
+            try
+            {
+                IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                // подключаемся к другому клиенту
+
+                IAsyncResult result = socket.BeginConnect(ipAddress, port, null, null);
+
+                bool success = result.AsyncWaitHandle.WaitOne(1000, true);
+
+                if (socket.Connected)
+                {
+                    socket.EndConnect(result);
+                    //отправляем клиенту данные для решения задачи
+                    socket.Send(HelperClass.ObjectToByteArray(
+                        new Message
+                        {
+                            Command = Command.Work,
+                            Data = messageData,
+                        }));
+                    //ждем ответ на подзадачу
+                    var answer = (Answer)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
+                    if (answer.DoneWork)
+                        answersValues.Add(answer.Value);
+                }
+                else
+                {
+                    socket.Close();
+                    Console.WriteLine($"Клиент {ipAddress} не смог решить свою часть задачи");
+                    //надо переназначить часть работы кому-то другому
+                }
+            }
+            catch
+            {
+                socket.Close();
+                Console.WriteLine($"Клиент {ipAddress} не смог решить свою часть задачи");
+                //если другой клиент не смог взять задачу на себя
             }
         }
     }

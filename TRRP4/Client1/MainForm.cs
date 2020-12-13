@@ -10,9 +10,11 @@ namespace Client
         public delegate void InvokeDelegate();
         readonly Client _client;
         readonly Reciver reciever;
+        public static MainForm CurrentForm;
         public MainForm()
         {
             InitializeComponent();
+            CurrentForm = this;
             _client = new Client();
             Task.Run(() => Loading());
             reciever = new Reciver(Client.GetLocalIP(), Configs.ClientPort);
@@ -24,12 +26,12 @@ namespace Client
         {
             Task.Run(() =>
             {
-                var answer = _client.StartWorking();
-                string strAnswer = "Не удалось получить ответ на задачу";
-                if (answer != null)
-                    strAnswer = $"Полученный ответ: {answer.Data.A}";
-                output.BeginInvoke(new InvokeDelegate(
-                () => { output.Text = strAnswer; }));
+                _client.DistributeWork();
+                //string strAnswer = "Не удалось получить ответ на задачу";
+                //if (answer != null)
+                //    strAnswer = $"Полученный ответ: {answer.Data.A}";
+                //output.BeginInvoke(new InvokeDelegate(
+                //() => { output.Text = strAnswer; }));
             });
 
             //btSend.Enabled = false;
