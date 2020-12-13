@@ -24,6 +24,11 @@ namespace Client
         public static ConcurrentDictionary<string, MessageData> clientsWorks =
             new ConcurrentDictionary<string, MessageData>();
         /// <summary>
+        /// Словарь ip адресов клиентов, выполняющих работу и соответствующих им сокетов
+        /// </summary>
+        public static ConcurrentDictionary<string, Socket> clientsSockets =
+            new ConcurrentDictionary<string, Socket>();
+        /// <summary>
         /// Ответы на подзадачи
         /// </summary>
         public static ConcurrentBag<int> answersValues =
@@ -37,7 +42,7 @@ namespace Client
         /// </summary>
         int countPartsWorkForMe;
         public static bool loaded = false;
-
+        static bool cancelled = false;
         public Client()
         {
             Task.Run(() => Greeting());
@@ -46,6 +51,9 @@ namespace Client
 
         public void Cancel()
         {
+            cancelled = true;
+            foreach(var socket in clientsSockets)
+                socket.Value.Close();
             //if (socket == null) return;
             //socket.Close();
             //socket = null;
@@ -299,13 +307,17 @@ namespace Client
         /// </summary>
         public void DistributeWork()
         {
+            //очищаем список сокетов
+            clientsSockets.Clear();
             //вычисляем часть задачи, которая будет выдана для решения другим клиентам
             //при этом себя тоже учитываем как исполнителя
             var partOfWork = levelTask / (otherClients.Count + 1);
             countPartsWork = otherClients.Count + 1;
             int a = 0;
             foreach (var client in otherClients)
-            { 
+            {
+                if (cancelled)
+                    return;
                 SendPartWorkToClient(client.Key, Configs.ClientPort,
                     new MessageData
                     {
@@ -330,7 +342,9 @@ namespace Client
                     var result = 0;
                     foreach (var answerValue in answersValues)
                         result += answerValue;
-                    CurrentForm.output.Text = $"Задача успешно решена, контрольная сумма{result}/{levelTask}";                   
+                    CurrentForm.output.Text = $"Задача успешно решена, контрольная сумма{result}/{levelTask}";
+                    CurrentForm.btnCancel.Enabled = false;
+                    CurrentForm.btSend.Enabled = true;
                 }));
             });
         }
@@ -377,6 +391,8 @@ namespace Client
                             Command = Command.Work,
                             Data = messageData,
                         }));
+                    //добавляем в список сокетов клиентов новый
+                    clientsSockets.TryAdd(ipAddress, socket);
                     //ждем ответ на подзадачу
                     var answer = (Answer)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
                     if (answer.DoneWork)

@@ -136,8 +136,8 @@ namespace Client
 
         #endregion
         private System.Windows.Forms.GroupBox gbInput;
-        private System.Windows.Forms.Button btSend;
-        private System.Windows.Forms.Button btnCancel;
+        public System.Windows.Forms.Button btSend;
+        public System.Windows.Forms.Button btnCancel;
         public System.Windows.Forms.RichTextBox output;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox info;

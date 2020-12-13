@@ -24,6 +24,8 @@ namespace Client
 
         private void btSend_Click(object sender, EventArgs e)
         {
+            btnCancel.Enabled = true;
+            btSend.Enabled = false;
             Task.Run(() =>
             {
                 _client.DistributeWork();
