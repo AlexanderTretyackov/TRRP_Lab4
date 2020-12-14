@@ -332,7 +332,7 @@ namespace Client
             RunPartOwnWork(new MessageData
             {
                 A = a,
-                B = a + partOfWork,
+                B = levelTask,
             });
 
             Task.Run(() => {
@@ -360,6 +360,7 @@ namespace Client
             {
                 var answer = Worker.DoWork(messageData);
                 answersValues.Add(answer.Value);
+                Console.WriteLine($"Мы сами решили подзадачу и получили ответ {answer.Value.ToString()}");
             });
         }
 
@@ -400,6 +401,7 @@ namespace Client
                     var answer = (Answer)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
                     if (answer.DoneWork)
                         answersValues.Add(answer.Value);
+                    Console.WriteLine($"Клиент {ipAddress} решил подзадачу и получил ответ {answer.Value.ToString()}");
                 }
                 else
                 {
