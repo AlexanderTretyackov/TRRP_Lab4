@@ -316,11 +316,12 @@ namespace Client
             var partOfWork = levelTask / (otherClients.Count + 1);
             countPartsWork = otherClients.Count + 1;
             int a = 0;
-            foreach (var client in otherClients)
+            var copy = new List<string>(otherClients.Keys);
+            foreach (var client in copy)
             {
                 if (cancelled)
                     return;
-                SendPartWorkToClient(client.Key, Configs.ClientPort,
+                SendPartWorkToClient(client, Configs.ClientPort,
                     new MessageData
                     {
                         A = a,
@@ -417,17 +418,17 @@ namespace Client
                 }
                 else
                 {
-                    socket.Close();
-                    CurrentForm.output.BeginInvoke(new InvokeDelegate(
-                    () =>
-                    {
-                        CurrentForm.output.Text += $"\nКлиент {ipAddress} не смог решить свою часть задачи";
-                    }));
-                    Console.WriteLine($"\nКлиент {ipAddress} не смог решить свою часть задачи");
-                    //надо переназначить часть работы кому-то другому
-                    MessageData messageData1 = null;
-                    if (clientsWorks.TryGetValue(ipAddress, out messageData1))
-                        RunPartOwnWork(messageData1);
+                    //socket.Close();
+                    //CurrentForm.output.BeginInvoke(new InvokeDelegate(
+                    //() =>
+                    //{
+                    //    CurrentForm.output.Text += $"\nКлиент {ipAddress} не смог решить свою часть задачи";
+                    //}));
+                    //Console.WriteLine($"\nКлиент {ipAddress} не смог решить свою часть задачи");
+                    ////надо переназначить часть работы кому-то другому
+                    //MessageData messageData1 = null;
+                    //if (clientsWorks.TryGetValue(ipAddress, out messageData1))
+                    //    RunPartOwnWork(messageData1);
                 }
             }
             catch
@@ -445,16 +446,23 @@ namespace Client
                 MessageData messageData1 = null;
                 if (clientsWorks.TryGetValue(ipAddress, out messageData1))
                 {
-                    clientsWorks.TryRemove(ipAddress, out messageData1);
+                    //clientsWorks.TryRemove(ipAddress, out messageData1);
                     bool resendedToClient = false;
-                    foreach (var otherClient in otherClients.Keys)
+                    foreach (var otherClientIp in otherClients.Keys)
                     {
                         //если клиент не работает над задачей
-                        if (!clientsWorks.ContainsKey(otherClient))
+                        if (!clientsWorks.ContainsKey(otherClientIp))
                         {
-                            SendPartWorkToClient(otherClient, Configs.ClientPort, messageData1);
-                            resendedToClient = true;
-                            break;
+                            resendedToClient = true; 
+                            CurrentForm.output.BeginInvoke(new InvokeDelegate(
+                             () =>
+                             {
+                                 IPEndPoint endPoint = null;
+                                 otherClients.TryGetValue(otherClientIp, out endPoint);
+                                 CurrentForm.output.Text += $"\nКлиент {endPoint.Address} взял задачу клиента {ipAddress}";
+                             }));
+                            SendPartWorkToClient(otherClientIp, Configs.ClientPort, messageData1);
+                            return;
                         }
                     }
                     if (!resendedToClient)
