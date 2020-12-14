@@ -395,6 +395,7 @@ namespace Client
                         }));
                     //добавляем в список сокетов клиентов новый
                     clientsSockets.TryAdd(ipAddress, socket);
+                    clientsWorks.TryAdd(ipAddress, messageData);
                     //ждем ответ на подзадачу
                     var answer = (Answer)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
                     if (answer.DoneWork)
