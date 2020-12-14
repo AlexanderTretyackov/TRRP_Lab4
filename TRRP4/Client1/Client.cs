@@ -153,7 +153,7 @@ namespace Client
         {
             try
             {
-                Console.WriteLine("testing : " + ip);
+                //Console.WriteLine("testing : " + ip);
 
                 bool result = SendHelloToClient(ip.ToString(), Configs.ClientPort);
 
@@ -164,13 +164,13 @@ namespace Client
                 {
                     IPEndPoint iPEndPoint;
                     otherClients.TryRemove(ip.ToString(), out iPEndPoint);
-                    Console.WriteLine($"УДАЛЕН {ip}");
+                    //Console.WriteLine($"УДАЛЕН {ip}");
                 }
 
             }
             catch
             {
-                Console.WriteLine("catch ex");
+                //Console.WriteLine("catch ex");
             }
             finally
             {
@@ -241,12 +241,13 @@ namespace Client
                 else
                 {
                     socket.Close();
-                    throw new ApplicationException("Failed to connect");
+                    return null;
+                    //throw new ApplicationException("Failed to connect");
                 }
             }
             catch
             {
-                Console.WriteLine($"stop working{socket.RemoteEndPoint}");
+                //Console.WriteLine($"stop working{socket.RemoteEndPoint}");
                 socket.Close();
                 return null;
             }
@@ -292,7 +293,8 @@ namespace Client
                 else
                 {
                     socket.Close();
-                    throw new ApplicationException("Failed to connect");
+                    return false;
+                    //throw new ApplicationException("Failed to connect");
                 }
             }
             catch
