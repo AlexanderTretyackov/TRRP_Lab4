@@ -437,14 +437,31 @@ namespace Client
                 CurrentForm.output.BeginInvoke(new InvokeDelegate(
                 () =>
                 {
-                   CurrentForm.output.Text += $"\nКлиент {ipAddress} не смог решить свою часть задачи";
+                    CurrentForm.output.Text += $"\nКлиент {ipAddress} не смог решить свою часть задачи";
                 }));
-                
+
                 Console.WriteLine($"\nКлиент {ipAddress} не смог решить свою часть задачи");
                 //если другой клиент не смог взять задачу на себя
                 MessageData messageData1 = null;
                 if (clientsWorks.TryGetValue(ipAddress, out messageData1))
-                    RunPartOwnWork(messageData1);
+                {
+                    clientsWorks.TryRemove(ipAddress, out messageData1);
+                    bool resendedToClient = false;
+                    foreach (var otherClient in otherClients.Keys)
+                    {
+                        //если клиент не работает над задачей
+                        if (!clientsWorks.ContainsKey(otherClient))
+                        {
+                            SendPartWorkToClient(otherClient, Configs.ClientPort, messageData1);
+                            resendedToClient = true;
+                            break;
+                        }
+                    }
+                    if (!resendedToClient)
+                    {
+                        RunPartOwnWork(messageData1);
+                    }
+                }
             }
         }
     }
