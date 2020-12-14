@@ -53,9 +53,9 @@ namespace Client
                 //string query = site + info + $"&mode={mode}";
 
                 //message = ReTry(query);
-                Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
-                                  $"{Thread.CurrentThread.Name} : " +
-                                  $"The message is received");
+                //Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
+                //                  $"{Thread.CurrentThread.Name} : " +
+                //                  $"The message is received");
                 //если пришло сообщение от другого клиента с приветсвием
                 if (message.Command == Command.Greeting)
                 {
@@ -86,9 +86,9 @@ namespace Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
-                                  $"{Thread.CurrentThread.Name} :" +
-                                  ex.Message);
+                //Console.WriteLine($"{DateTime.Now.ToString(new CultureInfo("ru-RU"))} " +
+                //                  $"{Thread.CurrentThread.Name} :" +
+                //                  ex.Message);
                 Worker.IsBusy = false;
                 //message = "Извените, но на данный момент невозможно получить ответ";
                 //if (handler != null && handler.Connected)

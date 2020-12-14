@@ -52,7 +52,7 @@ namespace Client
         public void Cancel()
         {
             cancelled = true;
-            foreach(var socket in clientsSockets)
+            foreach (var socket in clientsSockets)
                 socket.Value.Close();
             //if (socket == null) return;
             //socket.Close();
@@ -335,16 +335,18 @@ namespace Client
                 B = levelTask,
             });
 
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 //ждем пока не выполнятся все задачи
                 while (countPartsWork != answersValues.Count) { }
                 CurrentForm.output.BeginInvoke(
                     new InvokeDelegate(
-                () => {
+                () =>
+                {
                     var result = 0;
                     foreach (var answerValue in answersValues)
                         result += answerValue;
-                    CurrentForm.output.Text = $"Задача успешно решена, контрольная сумма{result}/{levelTask}";
+                    CurrentForm.output.Text += $"\nЗадача успешно решена, контрольная сумма{result}/{levelTask}";
                     CurrentForm.btnCancel.Enabled = false;
                     CurrentForm.btSend.Enabled = true;
                 }));
@@ -360,7 +362,12 @@ namespace Client
             {
                 var answer = Worker.DoWork(messageData);
                 answersValues.Add(answer.Value);
-                Console.WriteLine($"Мы сами решили подзадачу и получили ответ {answer.Value.ToString()}");
+                CurrentForm.output.BeginInvoke(new InvokeDelegate(
+                () =>
+                {
+                    CurrentForm.output.Text += $"\nМы сами решили подзадачу и получили ответ {answer.Value}";
+                }));
+                Console.WriteLine($"\nМы сами решили подзадачу и получили ответ {answer.Value}");
             });
         }
 
@@ -401,22 +408,39 @@ namespace Client
                     var answer = (Answer)HelperClass.ByteArrayToObject(HelperClass.RecieveMessage(socket));
                     if (answer.DoneWork)
                         answersValues.Add(answer.Value);
-                    Console.WriteLine($"Клиент {ipAddress} решил подзадачу и получил ответ {answer.Value.ToString()}");
+                    CurrentForm.output.BeginInvoke(new InvokeDelegate(
+                    () =>
+                    {
+                        CurrentForm.output.Text += $"\nКлиент {ipAddress} решил подзадачу и получил ответ {answer.Value}";
+                    }));
+                    Console.WriteLine($"\nКлиент {ipAddress} решил подзадачу и получил ответ {answer.Value}");
                 }
                 else
                 {
                     socket.Close();
-                    Console.WriteLine($"Клиент {ipAddress} не смог решить свою часть задачи");
+                    CurrentForm.output.BeginInvoke(new InvokeDelegate(
+                    () =>
+                    {
+                        CurrentForm.output.Text += $"\nКлиент {ipAddress} не смог решить свою часть задачи";
+                    }));
+                    Console.WriteLine($"\nКлиент {ipAddress} не смог решить свою часть задачи");
                     //надо переназначить часть работы кому-то другому
                     MessageData messageData1 = null;
-                    if(clientsWorks.TryGetValue(ipAddress, out messageData1))
+                    if (clientsWorks.TryGetValue(ipAddress, out messageData1))
                         RunPartOwnWork(messageData1);
                 }
             }
             catch
             {
                 socket.Close();
-                Console.WriteLine($"Клиент {ipAddress} не смог решить свою часть задачи");
+
+                CurrentForm.output.BeginInvoke(new InvokeDelegate(
+                () =>
+                {
+                   CurrentForm.output.Text += $"\nКлиент {ipAddress} не смог решить свою часть задачи";
+                }));
+                
+                Console.WriteLine($"\nКлиент {ipAddress} не смог решить свою часть задачи");
                 //если другой клиент не смог взять задачу на себя
                 MessageData messageData1 = null;
                 if (clientsWorks.TryGetValue(ipAddress, out messageData1))
