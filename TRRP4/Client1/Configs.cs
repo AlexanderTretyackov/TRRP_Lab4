@@ -9,6 +9,6 @@
         /// <summary>
         /// Сложность задачи
         /// </summary>
-        public static int levelWork = 1;
+        public static int levelWork = 5;
     }
 }
