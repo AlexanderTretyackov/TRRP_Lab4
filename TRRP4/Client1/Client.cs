@@ -403,6 +403,9 @@ namespace Client
                     socket.Close();
                     Console.WriteLine($"Клиент {ipAddress} не смог решить свою часть задачи");
                     //надо переназначить часть работы кому-то другому
+                    MessageData messageData1 = null;
+                    if(clientsWorks.TryGetValue(ipAddress, out messageData1))
+                        RunPartOwnWork(messageData1);
                 }
             }
             catch
@@ -410,6 +413,9 @@ namespace Client
                 socket.Close();
                 Console.WriteLine($"Клиент {ipAddress} не смог решить свою часть задачи");
                 //если другой клиент не смог взять задачу на себя
+                MessageData messageData1 = null;
+                if (clientsWorks.TryGetValue(ipAddress, out messageData1))
+                    RunPartOwnWork(messageData1);
             }
         }
     }
